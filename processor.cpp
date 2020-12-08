@@ -156,7 +156,7 @@ public:
 	// output edge list CSV by genre
 	void outputGraph(int n)
 	{
-		string fileName = "../graphs/category_" + to_string(n) + ".csv";
+		string fileName = "../graphs/category_" + categorizer(n) + ".csv";
 		ofstream graphFile(fileName);
 		graphFile << "Source,Target\n";
 		for (auto itr = graph.begin(); itr != graph.end(); itr++)
