@@ -1,5 +1,6 @@
 from pyvis.network import Network
 from matplotlib import axes
+import webbrowser
 import numpy as np
 from matplotlib import pyplot
 import pandas
@@ -12,7 +13,30 @@ def graphMaker (filename):
 
     #Default display options for graph
 
-    data = pandas.read_csv("graphs/" + filename + ".csv")  #change extension to CSV if need be
+    data = pandas.read_csv("graphs/" + filename + ".csv")
+    extraDataCA = pandas.read_csv("data/CAvideos.csv")
+    extraDataUSA = pandas.read_csv("data/USvideos.csv")
+    extraDataGB = pandas.read_csv("data/GBvideos.csv")
+
+    vectorLikes = np.concatenate((extraDataGB['likes'],extraDataUSA['likes'],extraDataCA['likes']))
+    vectorDislikes = np.concatenate((extraDataGB['dislikes'],extraDataUSA['dislikes'],extraDataCA['dislikes']))
+    vectorComments = np.concatenate((extraDataGB['comment_count'],extraDataUSA['comment_count'],extraDataCA['comment_count']))
+    vectorViews = np.concatenate((extraDataGB['views'],extraDataUSA['views'],extraDataCA['views']))
+    vectorTitles = np.concatenate((extraDataGB['title'],extraDataUSA['title'],extraDataCA['title']))
+    vectorID = np.concatenate((extraDataGB['video_id'],extraDataUSA['video_id'],extraDataCA['video_id']))
+
+    TitleMap = {}
+    for i in range(0,len(vectorTitles)):
+        TitleMap[vectorID[i]] = vectorTitles[i]
+
+    InfoMap = {}
+    for i in range(0, len(TitleMap)):
+        views = " Views: " + str(vectorViews[i])
+        likes = " Likes: " + str(vectorLikes[i])
+        dislikes = " Dislikes: " + str(vectorDislikes[i])
+        comments = " Number of Comments: " + str(vectorComments[i])
+        tempList = [views , likes , dislikes , comments]
+        InfoMap[TitleMap[vectorID[i]]] = tempList
 
     #RENAME IF NECESSARY
     sourceNodes = data['Source']
@@ -20,14 +44,15 @@ def graphMaker (filename):
 
     edges = zip(sourceNodes, destNodes)
     for i in edges:
-        fromNode = i[0]
-        toNode = i[1]
+        fromNode = TitleMap[i[0]]
+        toNode = TitleMap[i[1]]
 
         graphObj.add_node(fromNode,fromNode, title = fromNode)
         graphObj.add_node(toNode,toNode, title = toNode)
         graphObj.add_edge(fromNode, toNode)
-
-    reccomnededVids = graphObj.get_adj_list()
+    for node in graphObj.nodes:
+        node["title"] += "\n<br>" + "<br>".join(InfoMap[node["id"]])
+        node["value"] = 4
     graphObj.show("Visual Analysis for " + filename + " Videos on YouTube.html")
 
 def buildGUI():
@@ -37,13 +62,22 @@ def buildGUI():
     window.geometry('1280x720')
     lbl = ttk.Label(window, text="Please search for a YouTube video category to display visual analysis: ", font = ("Arial Bold", 25)).pack()  # Click event
 
-    def clickGraph():
-        print("Generating " + name.get() + "genre graph")# Textbox widget
-        graphMaker(name.get())
+    def CategoryClick(event):
+        selected = categoryDropDown.current()
+        option = categories[selected]
+        graphMaker(option)
 
-    name = tk.StringVar()
-    nameEntered = ttk.Entry(window, width=150, textvariable=name).pack()  # Button widget
-    button = ttk.Button(window, text="Search", command=clickGraph).pack()
+    file = pandas.read_csv("stats/avgComments.csv")
+    categoryDF = file['Category']
+    categories = categoryDF.values.tolist()
+
+    clicked = tk.StringVar()
+    clicked.set(categories[0])
+
+    categoryDropDown = ttk.Combobox(window, values=categories)
+    categoryDropDown.current(0)
+    categoryDropDown.bind('<<ComboboxSelected>>', CategoryClick)
+    categoryDropDown.pack()
 
     #Creating dropdown menu for stats analysis
 
@@ -76,23 +110,16 @@ def buildGUI():
     def avgReaction():
         data = pandas.read_csv("stats/avgReaction.csv")
         vectorX = data['Category']
-        vectorY = data['Percent Liked']
-        vectorZ = data['Percent Disliked']
-        """
-        vectorX = data['Category']
-        vectorY = data['Percent Liked']
-        vectorZ= data['Percent Disliked']
-        barWidth = 0.2
-        r1 = np.arange(len(vectorY))
-        r2 = [x + barWidth for x in r1]
-        r3 = [x + barWidth for x in r2]
+        vectorY = data[' Percent Liked']
+        vectorZ = data[' Percent Disliked']
+        r1 = np.arange(len(vectorX))
 
-        index = np.arrange(17)
-        p1 = pyplot.bar(index, vectorY,width = 0.2, x=vectorX)
-        pl = pyplot.bar(r2, vectorZ)
+        p1 = pyplot.bar(x=vectorX, height=vectorY)
+        pl = pyplot.bar(x=vectorX,height=vectorZ)
+        pyplot.xticks(rotation=90)
+        pyplot.title("Likes and Dislikes per Category")
         pyplot.show()
-        
-        """
+
     def numVideos():
         data = pandas.read_csv("stats/numVideos.csv")
         vectorX = data['Category']
@@ -116,27 +143,21 @@ def buildGUI():
         pyplot.xticks(rotation=90)
         pyplot.title("Likes per View per Category")
         pyplot.show()
-    def method_unknown():
-        print ("IDK")
 
-    def DropDownSelect(event):
-        selected = dropDown.current()
-        option = options[selected]
-        functionMap ={
-            'Average number of comments per category' : avgComments,
-            'Average number of views per category': avgViews,
-            'Average number of likes and dislikes per category': avgReaction,
-            'Measuring audience reaction per category': viewReaction,
-            'Number of videos per category': numVideos,
-            'Measuring reaction by views and comments per category': comReaction
-        }
-        func = functionMap.get(option,method_unknown)
-        func()
+    avgViewsImage = tk.PhotoImage(file='png/004-vision.png')
+    avgLikeImage = tk.PhotoImage(file="png/001-like.png")
+    avgCommentImage = tk.PhotoImage(file="png/003-list.png")
+    numVideosImage = tk.PhotoImage(file="png/006-number.png")
+    viewReactionImage = tk.PhotoImage(file="png/002-eye.png")
+    comReactionImage = tk.PhotoImage(file="png/005-watching-tv.png")
 
-    dropDown = ttk.Combobox(window, values = options)
-    dropDown.current(0)
-    dropDown.bind('<<ComboboxSelected>>', DropDownSelect)
-    dropDown.pack()
+    avgViewsButton = ttk.Button(window, text = 'Average number of views per category', command = avgViews, image = avgViewsImage).place(x=25, y=150)
+    avgLikeButton = ttk.Button(window, text='Average number of likes and dislikes per category', command=avgReaction, image = avgLikeImage ).place(x=615, y=150)
+    avgCommentButton = ttk.Button(window, text = 'Average number of comments per category', command = avgComments, image = avgCommentImage).place(x=1127, y=150)
+    numVideosButton = ttk.Button(window, text = 'Number of videos per category', command = numVideos, image = numVideosImage).place(x=25, y=450)
+    viewReactionButton = ttk.Button(window, text = 'Comparing likes and dislikes to views per category', command = viewReaction, image = viewReactionImage).place(x=615, y=450)
+    comReactionButton = ttk.Button(window, text = 'Compating likes and dislikes to comments per category', command = comReaction, image = comReactionImage).place(x=1127, y=450)
+
     window.mainloop()
 
 if __name__ == '__main__':
