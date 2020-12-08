@@ -2,8 +2,10 @@
 #include <fstream>
 #include <vector>
 #include <string>
+#include <chrono>
 #include <map>
 using namespace std;
+using namespace std::chrono;
 
 // OBJECT CONSTRUCTION
 struct Video
@@ -20,7 +22,7 @@ struct Video
 	string trending = "";	// year.date.month
 	string publish = "";	// year-month-dateTtime
 	string link = "https://www.youtube.com/watch?v=";
-	
+
 };
 string categorizer(int n)
 {
@@ -51,11 +53,11 @@ Video videoConstruct(string s)
 	Video vid;
 
 	vid.id = s.substr(0, s.find(','));
-		s = s.substr(s.find(',') + 1);
+	s = s.substr(s.find(',') + 1);
 
 	vid.trending = s.substr(0, s.find(','));
-		s = s.substr(s.find(',') + 1);
-	
+	s = s.substr(s.find(',') + 1);
+
 	// case handling of title and channels with commas
 	if (s[0] == '"')
 	{
@@ -82,25 +84,25 @@ Video videoConstruct(string s)
 	}
 
 	vid.category = stoi(s.substr(0, s.find(',')));
-		s = s.substr(s.find(',') + 1);
+	s = s.substr(s.find(',') + 1);
 
 	vid.publish = s.substr(0, s.find(','));
-		s = s.substr(s.find(',') + 1);
+	s = s.substr(s.find(',') + 1);
 
 	vid.views = stoi(s.substr(0, s.find(',')));
-		s = s.substr(s.find(',') + 1);
+	s = s.substr(s.find(',') + 1);
 
 	vid.likes = stoi(s.substr(0, s.find(',')));
-		s = s.substr(s.find(',') + 1);
+	s = s.substr(s.find(',') + 1);
 
 	vid.dislikes = stoi(s.substr(0, s.find(',')));
-		s = s.substr(s.find(',') + 1);
+	s = s.substr(s.find(',') + 1);
 
 	vid.comments = stoi(s.substr(0, s.find(',')));
-		s = s.substr(s.find(',') + 1);
+	s = s.substr(s.find(',') + 1);
 
 	vid.thumbnail = s.substr(0, s.find(','));
-		s = s.substr(s.find(',') + 1);
+	s = s.substr(s.find(',') + 1);
 
 	vid.link = vid.link + vid.id;
 
@@ -118,11 +120,9 @@ public:
 	{
 		int totNeighbors = 0;
 		int nodes = 0;
-		for (int i = arr.size()-1; i > 0; i--)
+		for (int i = arr.size() - 1; i > 0; i--)
 		{
 			string from = arr[i].id;
-			if (from == "#NAME?")
-				cout << "i: " << i;
 			int fromViews = arr[i].views;
 			int fromCategory = arr[i].category;
 			if (fromCategory == c)
@@ -137,7 +137,7 @@ public:
 					int toCategory = arr[j].category;
 					// only connect to videos that are within one magnitude
 					// and in the same category
-					if ((toViews >= (fromViews / 10)) && (fromCategory == c))
+					if ((toViews >= (fromViews / 10)) && (toCategory == c))
 					{
 						graph[from].push_back(to);
 						// increment neighbors
@@ -156,7 +156,7 @@ public:
 	// output edge list CSV by genre
 	void outputGraph(int n)
 	{
-		string fileName = "../graphs/category_" + categorizer(n) + ".csv";
+		string fileName = "./graphs/" + categorizer(n) + ".csv";
 		ofstream graphFile(fileName);
 		graphFile << "Source,Target\n";
 		for (auto itr = graph.begin(); itr != graph.end(); itr++)
@@ -180,10 +180,10 @@ void numberOfVideos(vector<Video>& arr)
 		totalVid++;
 	}
 
-	ofstream statsFile("../stats/numVideos.csv");
+	ofstream statsFile("./stats/numVideos.csv");
 	statsFile << "Category,Number of Videos,Percent of Total\n";
 	for (auto itr = chart.begin(); itr != chart.end(); itr++)
-		statsFile << categorizer(itr->first) << "," << itr->second << "," << (double) itr->second / totalVid << endl;
+		statsFile << categorizer(itr->first) << "," << itr->second << "," << (double)itr->second / totalVid << endl;
 	statsFile.close();
 };
 void averageViews(vector<Video>& arr)
@@ -195,10 +195,10 @@ void averageViews(vector<Video>& arr)
 		chart[arr[i].category].first += arr[i].views;
 		chart[arr[i].category].second++;
 	}
-	ofstream statsFile("../stats/avgViews.csv");
+	ofstream statsFile("./stats/avgViews.csv");
 	statsFile << "Category,Average Views\n";
 	for (auto itr = chart.begin(); itr != chart.end(); itr++)
-		statsFile << categorizer(itr->first) << "," <<(double)itr->second.first / (double)itr->second.second << endl;
+		statsFile << categorizer(itr->first) << "," << (double)itr->second.first / (double)itr->second.second << endl;
 	statsFile.close();
 };
 void averageComments(vector<Video>& arr)
@@ -210,7 +210,7 @@ void averageComments(vector<Video>& arr)
 		chart[arr[i].category].first += arr[i].comments;
 		chart[arr[i].category].second++;
 	}
-	ofstream statsFile("../stats/avgComments.csv");
+	ofstream statsFile("./stats/avgComments.csv");
 	statsFile << "Category,Average Comments\n";
 	for (auto itr = chart.begin(); itr != chart.end(); itr++)
 		statsFile << categorizer(itr->first) << "," << (double)(itr->second.first / itr->second.second) << endl;
@@ -228,7 +228,7 @@ void averageReaction(vector<Video>& arr)
 			chart[arr[i].category].second++;
 		}
 	}
-	ofstream statsFile("../stats/avgReaction.csv");
+	ofstream statsFile("./stats/avgReaction.csv");
 	statsFile << "Category, Percent Liked, Percent Disliked\n";
 	for (auto itr = chart.begin(); itr != chart.end(); itr++)
 	{
@@ -247,7 +247,7 @@ void averageViewReaction(vector<Video>& arr)
 		chart[arr[i].category].first += ((double)arr[i].likes / arr[i].views);
 		chart[arr[i].category].second++;
 	}
-	ofstream statsFile("../stats/viewReaction.csv");
+	ofstream statsFile("./stats/viewReaction.csv");
 	statsFile << "Category,Percent Viewers Who Like\n";
 	for (auto itr = chart.begin(); itr != chart.end(); itr++)
 		statsFile << categorizer(itr->first) << "," << (double)(itr->second.first / itr->second.second) << endl;
@@ -255,7 +255,7 @@ void averageViewReaction(vector<Video>& arr)
 };
 void commentReaction(vector<Video>& arr)
 {
-	ofstream statsFile("../stats/comReaction.csv");
+	ofstream statsFile("./stats/comReaction.csv");
 	statsFile << "Video Reaction,Video Comments\n";
 	for (int i = 0; i < arr.size(); i++)
 	{
@@ -265,7 +265,7 @@ void commentReaction(vector<Video>& arr)
 			double percentComment = ((double)arr[i].comments / arr[i].views);
 			statsFile << reactionRatio << "," << percentComment << endl;
 		}
-	}	
+	}
 	statsFile.close();
 };
 
@@ -300,6 +300,69 @@ void quickSort(vector<Video>& arr, int low, int high)
 		quickSort(arr, pivot + 1, high);
 	}
 }
+void shellSort(vector<Video>& arr)
+{
+	int n = arr.size();
+	for (int gap = n / 2; gap > 0; gap /= 2)
+	{
+		for (int i = gap; i < n; i++)
+		{
+			Video tmp = arr[i];
+			int j;
+			for (j = i; j >= gap && arr[j - gap].views > tmp.views; j -= gap)
+				arr[j] = arr[j - gap];
+			arr[j] = tmp;
+		}
+	}
+}
+void merge(vector<Video>& arr, int l, int m, int r)
+{
+	int n1 = m - l + 1;
+	int n2 = r - m;
+	vector<Video> L;
+	vector<Video> R;
+
+	for (int i = 0; i < n1; i++)
+		L[i] = arr[l + i];
+	for (int j = 0; j < n2; j++)
+		R[j] = arr[m + 1 + j];
+
+	int i = 0; int j = 0; int k = l;
+
+	while (i < n1 && j < n2)
+	{
+		if (L[i].views <= R[j].views)
+		{
+			arr[k] = L[i];
+			i++;
+		}
+		else
+		{
+			arr[k] = R[j];
+			j++;
+		}
+		k++;
+	}
+	while (i < n1)
+	{
+		arr[k] = L[i];
+		i++; k++;
+	}
+	while (j < n2)
+	{
+		arr[k] = R[j];
+		j++; k++;
+	}
+}
+void mergeSort(vector<Video>& arr, int l, int r)
+{
+	if (l > r)
+		return;
+	int m = (l + r - 1) / 2;
+	mergeSort(arr, l, m);
+	mergeSort(arr, m + 1, r);
+	merge(arr, l, m, r);
+}
 void insertionSort(vector<Video>& arr, int size)
 {
 	for (int i = 1; i < size; i++)
@@ -315,29 +378,45 @@ void insertionSort(vector<Video>& arr, int size)
 		arr[j + 1] = key;
 	}
 }
+void performanceEval(vector<Video>& l1)
+{
+	vector<Video> l2 = l1;
+
+	auto start1 = high_resolution_clock::now();
+	quickSort(l1, 0, l1.size() - 1);
+	auto stop1 = high_resolution_clock::now();
+
+	auto start2 = high_resolution_clock::now();
+	shellSort(l2);
+	auto stop2 = high_resolution_clock::now();
+
+	auto duration1 = duration_cast<milliseconds>(stop1 - start1);
+	auto duration2 = duration_cast<milliseconds>(stop2 - start2);
+
+	ofstream file("./stats/performance.txt");
+	file << duration1.count() << endl << duration2.count();
+	file.close();
+}
 
 
 // MAIN CODE
 int main()
 {
 	vector<Video> vidArray;
-	vector<Video> copy;
 
 	// load Video objects from csv files
 	string files[3] = { "USvideos.csv", "CAvideos.csv", "GBvideos.csv" };
 	for (int i = 0; i < 3; i++)
 	{
 		string line;
-		ifstream dataFile("../data/" + files[i]);
+		ifstream dataFile("./data/" + files[i]);
 		getline(dataFile, line);
 		while (getline(dataFile, line))
 			vidArray.push_back(videoConstruct(line));
 		dataFile.close();
 	}
-	// sort vector by views
-	//insertionSort(vidArray, vidArray.size());
-	//copy = vidArray;
-	quickSort(vidArray, 0, vidArray.size()-1);
+	// sort vector by views, compare performance
+	performanceEval(vidArray);
 
 	// create a graph by genre and output edge list CSV
 	int category[17] = { 1,2,10,15,17,19,20,22,23,
@@ -356,6 +435,6 @@ int main()
 	averageReaction(vidArray);
 	averageViewReaction(vidArray);
 	commentReaction(vidArray);
-	
+
 	return 0;
 }
