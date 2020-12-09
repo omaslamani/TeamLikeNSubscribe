@@ -209,8 +209,8 @@ def buildGUI():
     comReactionLabel = ttk.Label(window, text="Likes and Dislikes", font=("Lato Bold", 15)).place(x=615, y=650)
 
     speedFile = pandas.read_csv("stats/performance.txt")
-    quickTime = "Quick Sort Time: " + str(speedFile['_'][0]) + " seconds"
-    mergeTime = "Merge Sort Time: " + str(speedFile['_'][1]) + " seconds"
+    quickTime = "Quick Sort Time: " + str(speedFile['_'][0]) + " milliseconds"
+    mergeTime = "Merge Sort Time: " + str(speedFile['_'][1]) + " milliseconds"
     quickLabel = ttk.Label(window, text=quickTime, font = ("Lato Bold", 15)).place(x=33, y=400)
     mergeLabel = ttk.Label(window, text = mergeTime, font = ("Lato Bold", 15)).place(x=33, y=430)
 
