@@ -129,7 +129,7 @@ def buildGUI():
         vectorX = data['Video Reaction']
         vectorY = data['Video Comments']
         pyplot.scatter(vectorX,vectorY, alpha=0.5)
-        pyplot.title("Like and Dislike to Comments ratio")
+        pyplot.title("Like/Dislike Ratio to Comment Ratio")
         pyplot.show()
     def avgViews():
         data = pandas.read_csv("stats/avgViews.csv")
@@ -168,11 +168,11 @@ def buildGUI():
         vectorZ *= 100
         pyplot.bar(x=vectorX, height=vectorY)
         pyplot.xticks(rotation=90)
-        pyplot.title("Number of Views per Category")
+        pyplot.title("Number of Videos per Category")
         pyplot.show()
         pyplot.pie(vectorZ, labels=vectorX)
         pyplot.axis('equal')
-        pyplot.title("Percentage of total videos")
+        pyplot.title("Percentage of Total Videos")
         pyplot.show()
     def viewReaction():
         data = pandas.read_csv("stats/viewReaction.csv")
@@ -181,7 +181,7 @@ def buildGUI():
         vectorY *= 100
         pyplot.bar(x=vectorX, height=vectorY)
         pyplot.xticks(rotation=90)
-        pyplot.title("Likes per View per Category")
+        pyplot.title("Likes per View by Category")
         pyplot.show()
 
     lbl2 = ttk.Label(window, text="Select an icon to display graphical analysis: ",font=("Lato Bold", 15)).place(x=200,y=100)
@@ -195,28 +195,28 @@ def buildGUI():
     avgViewsButton = ttk.Button(window, text = 'Average number of views per category', command = avgViews, image = avgViewsImage).place(x=25, y=200)
     avgLikeButton = ttk.Button(window, text='Average number of likes and dislikes per category', command=avgReaction, image = avgLikeImage).place(x=331, y=200)
     avgCommentButton = ttk.Button(window, text = 'Average number of comments per category', command = avgComments, image = avgCommentImage).place(x=617, y=200)
-    numVideosButton = ttk.Button(window, text = 'Number of videos per category', command = numVideos, image = numVideosImage).place(x=25, y=500)
-    viewReactionButton = ttk.Button(window, text = 'Comparing likes and dislikes to views per category', command = viewReaction, image = viewReactionImage).place(x=331, y=500)
-    comReactionButton = ttk.Button(window, text = 'Compating likes and dislikes to comments per category', command = comReaction, image = comReactionImage).place(x=617, y=500)
+    numVideosButton = ttk.Button(window, text = 'Number of videos per category', command = numVideos, image = numVideosImage).place(x=25, y=400)
+    viewReactionButton = ttk.Button(window, text = 'Comparing likes and dislikes to views per category', command = viewReaction, image = viewReactionImage).place(x=331, y=400)
+    comReactionButton = ttk.Button(window, text = 'Compating likes and dislikes to comments per category', command = comReaction, image = comReactionImage).place(x=617, y=400)
 
     avgViewLabel = ttk.Label(window, text = "Average Views", font = ("Lato Bold", 15)).place(x=33,y=350)
     avgLikeLabel = ttk.Label(window, text="Average Likes", font=("Lato Bold", 15)).place(x=345, y=350)
     avgCommentLabel = ttk.Label(window, text="Average Comments", font=("Lato Bold", 15)).place(x=607, y=350)
-    numViewLabel = ttk.Label(window, text="Number of Videos", font=("Lato Bold", 15)).place(x=23, y=650)
-    viewReactionLabel2 = ttk.Label(window, text="vs Views", font=("Lato Bold", 15)).place(x=365, y=670)
-    viewReactionLabel = ttk.Label(window, text="Likes and Dislikes", font=("Lato Bold", 15)).place(x=327, y=650)
-    comReactionLabel2 = ttk.Label(window, text="vs Comments", font=("Lato Bold", 15)).place(x=637, y=670)
-    comReactionLabel = ttk.Label(window, text="Likes and Dislikes", font=("Lato Bold", 15)).place(x=615, y=650)
+    numViewLabel = ttk.Label(window, text="Number of Videos", font=("Lato Bold", 15)).place(x=23, y=550)
+    viewReactionLabel2 = ttk.Label(window, text="vs Views", font=("Lato Bold", 15)).place(x=365, y=570)
+    viewReactionLabel = ttk.Label(window, text="Likes and Dislikes", font=("Lato Bold", 15)).place(x=327, y=550)
+    comReactionLabel2 = ttk.Label(window, text="vs Comments", font=("Lato Bold", 15)).place(x=637, y=570)
+    comReactionLabel = ttk.Label(window, text="Likes and Dislikes", font=("Lato Bold", 15)).place(x=615, y=550)
 
     speedFile = pandas.read_csv("stats/performance.txt")
-    quickTime = "Quick Sort Time: " + str(speedFile['_'][0]) + " milliseconds"
-    mergeTime = "Merge Sort Time: " + str(speedFile['_'][1]) + " milliseconds"
-    quickLabel = ttk.Label(window, text=quickTime, font = ("Lato Bold", 15)).place(x=33, y=400)
-    mergeLabel = ttk.Label(window, text = mergeTime, font = ("Lato Bold", 15)).place(x=33, y=430)
+    quickTime = "Quick Sort Time: " + str(speedFile["Time"][0]) + " milliseconds"
+    mergeTime = "Shell Sort Time: " + str(speedFile["Time"][1]) + " milliseconds"
+    quickLabel = ttk.Label(window, text=quickTime, font = ("Lato Bold", 15)).place(x=33, y=630)
+    mergeLabel = ttk.Label(window, text = mergeTime, font = ("Lato Bold", 15)).place(x=33, y=670)
 
 
     window.mainloop()
 
 if __name__ == '__main__':
-    #subprocess.call('processor.cpp')
+    subprocess.call("processor.exe")
     buildGUI()

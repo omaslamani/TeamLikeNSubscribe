@@ -315,69 +315,6 @@ void shellSort(vector<Video>& arr)
 		}
 	}
 }
-void merge(vector<Video>& arr, int l, int m, int r)
-{
-	int n1 = m - l + 1;
-	int n2 = r - m;
-	vector<Video> L;
-	vector<Video> R;
-
-	for (int i = 0; i < n1; i++)
-		L[i] = arr[l + i];
-	for (int j = 0; j < n2; j++)
-		R[j] = arr[m + 1 + j];
-
-	int i = 0; int j = 0; int k = l;
-
-	while (i < n1 && j < n2)
-	{
-		if (L[i].views <= R[j].views)
-		{
-			arr[k] = L[i];
-			i++;
-		}
-		else
-		{
-			arr[k] = R[j];
-			j++;
-		}
-		k++;
-	}
-	while (i < n1)
-	{
-		arr[k] = L[i];
-		i++; k++;
-	}
-	while (j < n2)
-	{
-		arr[k] = R[j];
-		j++; k++;
-	}
-}
-void mergeSort(vector<Video>& arr, int l, int r)
-{
-	if (l > r)
-		return;
-	int m = (l + r - 1) / 2;
-	mergeSort(arr, l, m);
-	mergeSort(arr, m + 1, r);
-	merge(arr, l, m, r);
-}
-void insertionSort(vector<Video>& arr, int size)
-{
-	for (int i = 1; i < size; i++)
-	{
-		Video key = arr[i];
-		int j = i - 1;
-
-		while (j >= 0 && arr[j].views > key.views)
-		{
-			arr[j + 1] = arr[j];
-			j--;
-		}
-		arr[j + 1] = key;
-	}
-}
 void performanceEval(vector<Video>& l1)
 {
 	vector<Video> l2 = l1;
@@ -394,7 +331,7 @@ void performanceEval(vector<Video>& l1)
 	auto duration2 = duration_cast<milliseconds>(stop2 - start2);
 
 	ofstream file("./stats/performance.txt");
-	file << duration1.count() << endl << duration2.count();
+	file << "Time\n" << duration1.count() << endl << duration2.count();
 	file.close();
 }
 
